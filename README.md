@@ -1,3 +1,5 @@
+(assets/contextit_logo.svg)
+
 # Claudeit
 
 *Claude forgets. contextit remembers.*
