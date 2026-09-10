@@ -1,4 +1,4 @@
-# contextit
+# Claudeit
 
 *Claude forgets. contextit remembers.*
 
