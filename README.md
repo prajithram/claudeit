@@ -1,8 +1,10 @@
-(assets/contextit_logo.svg)
+<div align="center">
+  <img src="assets/contextit_logo.svg" alt="claudeit — persistent project memory for Claude Code" width="800"/>
+</div>
 
-# Claudeit
+<br/>
 
-*Claude forgets. contextit remembers.*
+> *Claude forgets. claudeit remembers.*
 
 ---
 
@@ -10,29 +12,27 @@ Every session starts the same way. You open Claude Code, say "let's keep working
 
 You explain Next.js. Again. You explain Tailwind. Again. You explain why you chose Zustand over Redux three weeks ago. Again.
 
-contextit fixes that. One command at the start of a session, Claude knows everything. Your stack, your UI theme, your decisions, your guardrails. You never re-explain. You just work.
+**claudeit fixes that.** One command at the start of a session and Claude knows everything — your stack, your UI theme, your decisions, your guardrails. You never re-explain. You just work.
 
 ## Before / after
 
-You start a session to build a new feature.
-
-**Without contextit:**
+**Without claudeit:**
 ```
-You:   "let's add a payment form"
+You:    "let's add a payment form"
 Claude: "Sure! What stack are you using?"
-You:   "Next.js, Tailwind, Shadcn, Stripe..."
+You:    "Next.js, Tailwind, Shadcn, Stripe..."
 Claude: "Got it. What's your color theme?"
-You:   "Neutral slate, dark mode default, Inter font..."
+You:    "Neutral slate, dark mode default, Inter font..."
 Claude: "Any conventions I should follow?"
-You:   "We already decided not to use modals, everything is—"
+You:    "We already decided not to use modals, everything is—"
 ```
 Five minutes of re-explaining before a line of code.
 
-**With contextit:**
+**With claudeit:**
 ```
 claudeit load
 
-📦 contextit loaded — Payments Platform
+📦 claudeit loaded — Payments Platform
    Stack:        Next.js 14 · TypeScript · Prisma · Tailwind · Stripe
    UI:           Shadcn/ui · slate · dark default · Inter
    Now building: checkout redesign
@@ -43,8 +43,7 @@ What are we working on today?
 
 ## How it works
 
-contextit extends Claude's built-in `CLAUDE.md` system with a `.contextit/` folder
-of structured SDLC context files. Claude reads them at the start of every session.
+claudeit extends Claude's built-in `CLAUDE.md` system with a `.contextit/` folder of structured project context files. Claude reads them at the start of every session.
 
 ```
 your-project/
@@ -59,78 +58,88 @@ your-project/
     └── guardrails.md      ← What NOT to build — Claude enforces this
 ```
 
-After `claudeit load`, Claude knows all of it. It writes UI code in your theme.
-It follows your conventions. It never re-suggests things you already rejected.
-It flags new ideas that conflict with your guardrails — before you build them.
+After `claudeit load`, Claude knows all of it. It writes UI code in your theme. It follows your conventions. It never re-suggests approaches you already rejected. It flags new ideas that conflict with your guardrails — before you build them.
 
 ## Two modes
 
 ### sctx — Solo
 
-Just you. No git required. Context lives in `.contextit/` in your project root.
-Survives session resets. Claude reads it on load, updates it on save.
+Just you. No git required. Context lives in `.contextit/` in your project root. Survives session resets. Claude reads it on load, updates it on save.
 
 ```
-claudeit init    ← one-time setup
+claudeit init    ← one-time setup, scans your project and asks questions
 claudeit load    ← start of every session
 claudeit save    ← end of every session
 ```
 
 ### dctx — Distributed
 
-A team. Context lives in a shared git repo. Every developer runs `claudeit load`
-to pull the latest. One developer's decision becomes everyone's context on their
-next load. New teammates run one command and arrive fully context-aware.
+A team sharing one context. Context lives in a shared GitHub repo. Every developer runs `claudeit load` to pull the latest. One developer's decision becomes everyone's context on their next load. New teammates run one command and arrive fully context-aware — no onboarding conversation needed.
 
 ```
-claudeit init           ← project owner, one time
-claudeit join <url>     ← every teammate, one time
+claudeit init           ← project owner, once
+claudeit join <url>     ← every teammate, once
 claudeit load           ← everyone, every session
 claudeit save           ← everyone, every session
 ```
 
 ## Install
 
-Add the skill to Claude Code:
+claudeit is a skill for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Install it with:
 
-```
+```bash
 /skills add contextit.skill
 ```
 
-Then type `claudeit` in any session to get started.
-
-## Usage
-
-### First time
+Then in any Claude Code session, type:
 
 ```
 claudeit
 ```
 
-Claude asks one question: **SOLO or DISTRIBUTED?**
+That's it. claudeit takes it from there.
 
-Explains both options, waits for your answer, then branches into the right setup flow.
-From there, one question at a time — never a form, always a conversation.
+## First time setup
 
-### Every session (solo)
+When you type `claudeit` for the first time, Claude asks one question:
 
 ```
-claudeit load    ← reads .contextit/, briefs Claude
+👋 Welcome to claudeit — project memory for Claude Code.
+
+  [1] SOLO — Just you. No team, no git required.
+          Context saved locally on this machine.
+
+  [2] DISTRIBUTED — A team sharing context via a git repo.
+          Every developer stays in sync automatically.
+
+Which fits your project? (1 or 2)
+```
+
+One answer. Claude branches into the right setup flow and asks questions one at a time — never a form, always a conversation. It scans your codebase first so it only asks about what it couldn't detect.
+
+## Usage
+
+### Every session — solo
+
+```
+claudeit load    ← reads .contextit/, briefs Claude on your project
 ...work...
-claudeit save    ← Claude shows what changed, writes files
+claudeit save    ← Claude shows what changed, you confirm, files update
 ```
 
-### Every session (distributed)
+### Every session — distributed
 
 ```
-claudeit load    ← git pull + reads files + briefs Claude
+claudeit load    ← git pull latest + reads files + briefs Claude
 ...work...
-claudeit save    ← Claude shows diff, writes files, git push
+claudeit save    ← Claude shows diff, you confirm, git push to team
 ```
 
 Teammates see your updates on their next `claudeit load`.
 
-### Mid-session
+### Mid-session updates
+
+Don't wait for save — update context the moment something is decided:
 
 ```
 claudeit update ui "switched to Geist font"
@@ -141,10 +150,9 @@ claudeit status
 
 ## Guardrails
 
-The most important file in `.contextit/` is `guardrails.md`.
+The most powerful file in `.contextit/` is `guardrails.md`.
 
-It captures what NOT to build — scope limits, banned patterns, technical constraints,
-ethical lines. Claude checks every new suggestion against it automatically.
+It captures what **NOT** to build — scope limits, banned patterns, technical constraints, ethical lines. Claude checks every new suggestion against it automatically, every session, without being asked.
 
 When something conflicts:
 
@@ -160,39 +168,33 @@ When something conflicts:
 
 Guardrails are permanent. They can be overridden with a reason, never silently deleted.
 
-## Distributed setup — what each person does
+## Distributed setup
 
-**Project owner** (once):
+**Step 1 — Project owner runs (once):**
 ```
 claudeit init
 ```
-Claude walks through 4 phases: create repo on GitHub → set up token → build context → push.
-At the end, Claude outputs one line to share with the team:
-```
-claudeit join https://github.com/your-org/project-context.git
-```
+Claude walks through 4 phases: create repo on GitHub → set up token → build context → push. At the end it gives you one line to share with your team.
 
-**Every teammate** (once):
+**Step 2 — Every teammate runs (once):**
 ```
 claudeit join https://github.com/your-org/project-context.git
 ```
-Claude walks through token setup, clones the context repo, loads everything, briefs immediately.
-One command. Fully context-aware from the first session.
+Claude handles token setup, clones the context, loads everything, and briefs immediately. One command. Fully context-aware from the first session.
 
 ## Authentication (distributed only)
 
-contextit uses HTTPS + Personal Access Token. No SSH setup required.
+claudeit uses HTTPS + Personal Access Token. No SSH setup required.
 
-When you run `claudeit init` or `claudeit join`, Claude detects whether you're already
-authenticated. If not, it walks you through creating a token on GitHub and stores it
-securely in your OS keychain — never in any file, never committed to git.
+When you run `claudeit init` or `claudeit join`, Claude detects whether you're already authenticated. If not, it walks you through creating a GitHub token step by step and stores it securely in your OS keychain — never in any file, never committed to git.
 
-**macOS** → stored in Keychain  
-**Windows** → stored in Windows Credential Manager via Git Credential Manager  
-**Linux** → stored in libsecret / GNOME keyring (plaintext fallback with warning)
+| OS | Where token is stored |
+|---|---|
+| macOS | Keychain |
+| Windows | Windows Credential Manager (via Git Credential Manager) |
+| Linux | libsecret / GNOME keyring (plaintext fallback with warning) |
 
-Token expired? Run `claudeit login reset` — Claude clears the old one and
-walks you through entering a new one.
+Token expired? Run `claudeit login reset` — Claude clears the old one and walks you through a new one.
 
 Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.md)
 
@@ -201,12 +203,12 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 | Command | What it does |
 |---|---|
 | `claudeit` | Smart entry — loads if initialized, starts setup if not |
-| `claudeit init` | First-time setup — asks SOLO or DISTRIBUTED, then guides through |
+| `claudeit init` | First-time setup — asks SOLO or DISTRIBUTED, guides through |
 | `claudeit load` | Start of session — pull (dctx) + read context + brief Claude |
 | `claudeit save` | End of session — show diff, write files, push (dctx) |
 | `claudeit update <file> <change>` | Mid-session context update |
 | `claudeit status` | Features snapshot, last save, open TODOs |
-| `claudeit join <url>` | Join a distributed project |
+| `claudeit join <url>` | Join a distributed project as a teammate |
 | `claudeit login` | Set up or refresh git authentication |
 | `claudeit login reset` | Clear expired token and re-authenticate |
 
@@ -215,7 +217,7 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 | File | What Claude knows |
 |---|---|
 | `stack.md` | Languages, frameworks, libraries, infra, versions — no more "what are you using?" |
-| `architecture.md` | System design, folder structure, data flow, patterns |
+| `architecture.md` | System design, folder structure, data flow, key patterns |
 | `ui.md` | Theme, colors, fonts, component library — Claude writes matching UI code automatically |
 | `features.md` | What's shipped, building, planned, dropped — no more "where are we?" |
 | `decisions.md` | What was decided and why — Claude never re-suggests what you already rejected |
@@ -225,34 +227,30 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 ## Context hygiene
 
 - `decisions.md` and `guardrails.md` are append-only — never edited, only added to
-- `features.md` max 3 items in "building" — Claude enforces focus
-- Files over 300 lines → Claude archives old entries automatically
-- No secrets ever written to `.contextit/` — Claude refuses and warns
-- Guardrail overrides require a dated reason — original rule is never deleted
+- `features.md` enforces max 3 items in "building" — keeps focus
+- Files over 300 lines → Claude archives old entries automatically to keep load fast
+- No secrets ever written to `.contextit/` — Claude refuses and warns if detected
+- Guardrail overrides require a dated reason — the original rule is never deleted
 
 ## FAQ
 
-**Does it need a config file?**  
-Yes — `.contextit/.contextit.json`. Claude creates it during init. You never edit it by hand.
+**Do I need to know git to use this?**  
+For SOLO mode — no. No git involved at all. For DISTRIBUTED mode — you need a GitHub account. claudeit handles everything else step by step.
 
 **What if my project directory is empty?**  
-Claude still runs the interview, one question at a time, and builds the context from
-your answers. Partial context beats no context.
+Claude runs the setup interview one question at a time and builds context from your answers. Partial context beats no context — you can always add more later.
 
-**What if a teammate makes a decision I disagree with?**  
-Context updates go through `claudeit save` which shows a diff before committing.
-In distributed mode, treat context PRs like code PRs — review before merging.
+**Does it work with an existing `CLAUDE.md`?**  
+Yes. claudeit appends one pointer line to your existing `CLAUDE.md` and leaves everything else untouched. Both systems work together.
 
-**Does it work with existing CLAUDE.md files?**  
-Yes. contextit appends one pointer line to your existing `CLAUDE.md` and leaves
-everything else untouched. Both systems work together.
+**What if a teammate pushes context I disagree with?**  
+claudeit always shows a diff before committing. In distributed mode, treat context changes like code changes — review before merging if your team wants that control.
 
-**What if I want to add GitLab later?**  
-GitLab support is on the roadmap. The token flow is identical — only the host
-and scope names differ.
+**Can I use it across multiple projects?**  
+Yes. Each project has its own `.contextit/` folder. Completely independent. Run `claudeit init` in each project once.
 
-**Can I use it on multiple projects?**  
-Yes. Each project has its own `.contextit/` folder. Completely independent.
+**What if I want to use GitLab?**  
+GitLab support is on the roadmap. The token flow is identical — only the host and scope names differ.
 
 ## License
 
