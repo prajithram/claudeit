@@ -629,6 +629,7 @@ Reports: mode, features summary (shipped/building/planned), last save date, any 
 | `decisions.md` | What was decided and why — never re-suggests rejected approaches |
 | `conventions.md` | Naming, file structure, git, testing — follows automatically |
 | `guardrails.md` | What NOT to build — flags conflicts proactively |
+| `responsible-ai.md` | Six core AI principles — conflicts require written justification, logged permanently |
 
 Guardrail enforcement during session:
 ```
@@ -662,6 +663,152 @@ claudeit save                     claudeit save
 
 ---
 
+
+---
+
+## Responsible AI Framework (opt-in)
+
+claudeit embeds a Responsible AI framework as an opt-in during `claudeit init`.
+It lives in `.contextit/responsible-ai.md` and is enforced by Claude every session
+alongside `guardrails.md`. Full guide: `references/responsible-ai-guide.md`
+
+---
+
+### Opt-in during `claudeit init`
+
+After the guardrails interview, Claude asks one question (its own turn):
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Responsible AI Framework                                       │
+├─────────────────────────────────────────────────────────────────┤
+│  Would you like to add a Responsible AI framework?              │
+│                                                                 │
+│  Six locked core principles — Transparency, Privacy,            │
+│  Fairness, Human Control, Safety, Accountability —              │
+│  checked against every feature and decision, every session.     │
+│                                                                 │
+│  Conflicts require a written justification before continuing.   │
+│  Overrides are logged permanently.                              │
+│                                                                 │
+│  You can add project-specific principles on top.                │
+│  Core principles cannot be removed.                             │
+│                                                                 │
+│  Add Responsible AI framework? (yes / no)                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**If NO** → Claude logs it as an explicit decision in `decisions.md` and moves on.
+
+**If YES** → Claude asks one follow-up (its own separate turn):
+```
+Any project-specific AI principles to add on top of the core six?
+For example: "No AI-generated content in medical contexts without
+clinical review" or "All AI suggestions reviewed by a human before
+going live."
+
+Type them now, or press enter to skip.
+```
+
+Then writes `.contextit/responsible-ai.md` and confirms:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ✅ Responsible AI framework added                              │
+│  6 core principles locked                                       │
+│  [N] project principles added                                   │
+│  Active from this session onwards                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### The Six Core Principles (locked for all projects)
+
+| Principle | What Claude checks |
+|---|---|
+| **Transparency** | AI-generated content presented to users without disclosure |
+| **Privacy** | Data collection, tracking, third-party sharing without consent |
+| **Fairness** | Features that could disadvantage user groups or introduce bias |
+| **Human Control** | AI actions taken without user confirmation or review |
+| **Safety** | High-stakes outputs without disclaimers or human review gates |
+| **Accountability** | AI-influenced decisions with no audit trail or explanation |
+
+Core principles are **locked** — they cannot be deleted, only overridden
+with a written justification that is permanently logged.
+
+---
+
+### Conflict Enforcement
+
+When Claude detects a conflict during a session:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️  Responsible AI Conflict                                    │
+├─────────────────────────────────────────────────────────────────┤
+│  Proposed:   "Auto-send AI-drafted emails without user review"  │
+│  Principle:  Human Control                                      │
+│  Rule:       Consequential actions require human confirmation.  │
+│              No autonomous AI actions without human in loop.   │
+├─────────────────────────────────────────────────────────────────┤
+│  Provide a written justification to proceed, or type CANCEL.   │
+│  Your justification will be logged permanently.                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+Claude waits. Developer must type a real justification — not "yes", "ok",
+or "approved". Claude rejects thin responses:
+
+```
+❌ "It's fine"              → not a justification
+❌ "User agreed to TOS"     → not specific enough
+❌ "We need it to ship"     → not a principle-based reason
+
+✅ "Emails are drafts only — user reviews and confirms before
+   send. Auto refers to drafting only. Human control over
+   sending is fully preserved."
+```
+
+Once valid, Claude appends to `responsible-ai.md`:
+
+```markdown
+## YYYY-MM-DD: Override — Human Control
+**Feature:** Auto-draft emails
+**Conflict:** Autonomous AI action without human confirmation
+**Justification:** Drafting only — user confirms before send.
+**Logged by:** @author
+```
+
+---
+
+### `claudeit update responsible-ai "<principle>"`
+
+Add a project-specific principle at any time:
+```
+claudeit update responsible-ai "No AI content in patient-facing
+outputs without clinical review"
+```
+
+Project principles behave like core principles — conflicts require
+justification and are logged. Unlike core principles, they can be
+removed by the project owner with a logged reason.
+
+---
+
+### Session Load with Responsible AI active
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  📦 claudeit loaded — [Project Name]                           │
+│  🛡️  Responsible AI: 6 core + [N] project principles active    │
+├─────────────────────────────────────────────────────────────────┤
+│  Stack:  ...                                                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+Claude holds all principles in active memory and checks them against
+every new feature, suggestion, or decision — without being asked.
+
 ## Context Hygiene
 
 1. `decisions.md` and `guardrails.md` — append-only, never edited
@@ -681,6 +828,7 @@ claudeit save                     claudeit save
 | `claudeit load` | Start of session — read context, brief Claude |
 | `claudeit save` | End of session — update context files |
 | `claudeit update <file> <change>` | Mid-session context update |
+| `claudeit update responsible-ai "<principle>"` | Add a project-specific AI principle |
 | `claudeit status` | Project snapshot |
 | `claudeit join <url>` | Join a distributed project |
 | `claudeit login` | Set up git auth (SSH or HTTPS token) |
@@ -692,4 +840,5 @@ claudeit save                     claudeit save
 - `references/templates.md` — File templates for all `.contextit/` files
 - `references/init-interview.md` — How Claude extracts context during setup
 - `references/guardrails.md` — How to write and enforce good guardrails
+- `references/responsible-ai-guide.md` — Full Responsible AI framework, principles, and enforcement rules
 - `references/git-token-setup.md` — Step-by-step PAT setup for GitHub/GitLab on macOS and Windows
