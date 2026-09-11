@@ -37,6 +37,7 @@ claudeit load
    UI:           Shadcn/ui · slate · dark default · Inter
    Now building: checkout redesign
    Guardrails:   no modals · no third-party analytics
+   Responsible AI: 6 core principles active
 
 What are we working on today?
 ```
@@ -55,7 +56,8 @@ your-project/
     ├── features.md        ← Shipped / building / planned / dropped
     ├── decisions.md       ← What was decided and why
     ├── conventions.md     ← Naming, structure, git, testing rules
-    └── guardrails.md      ← What NOT to build — Claude enforces this
+    ├── guardrails.md      ← What NOT to build — Claude enforces this
+    └── responsible-ai.md  ← Responsible AI principles (opt-in) — Claude enforces every session
 ```
 
 After `claudeit load`, Claude knows all of it. It writes UI code in your theme. It follows your conventions. It never re-suggests approaches you already rejected. It flags new ideas that conflict with your guardrails — before you build them.
@@ -168,6 +170,44 @@ When something conflicts:
 
 Guardrails are permanent. They can be overridden with a reason, never silently deleted.
 
+## Responsible AI
+
+During `claudeit init`, Claude asks if you want to add a Responsible AI framework to your project. It's opt-in — but once added, it's enforced every session alongside guardrails.
+
+Six core principles are locked for every project that opts in:
+
+| Principle | What Claude checks |
+|---|---|
+| **Transparency** | AI-generated content shown to users without disclosure |
+| **Privacy** | Data collection or tracking without explicit user consent |
+| **Fairness** | Features that could disadvantage or bias against user groups |
+| **Human Control** | AI actions taken without user confirmation or review |
+| **Safety** | High-stakes outputs without disclaimers or human review gates |
+| **Accountability** | AI-influenced decisions with no audit trail or explanation |
+
+When something conflicts, Claude doesn't just flag it — it requires a **written justification** before you can continue. The justification is logged permanently to `responsible-ai.md`.
+
+```
+⚠️  Responsible AI Conflict
+
+Proposed:   "Auto-send AI-drafted emails without user review"
+Principle:  Human Control
+Rule:       Consequential actions require human confirmation.
+
+Provide a written justification to proceed, or type CANCEL.
+Your justification will be logged permanently.
+```
+
+Claude rejects thin responses — "it's fine" or "we need it to ship" don't pass. You have to explain why the conflict is acceptable in your specific context. That logged justification is your accountability trail.
+
+You can add project-specific principles on top of the core six:
+
+```
+claudeit update responsible-ai "No AI content in patient-facing outputs without clinical review"
+```
+
+Core principles cannot be removed. Project principles can be removed by the project owner with a logged reason.
+
 ## Distributed setup
 
 **Step 1 — Project owner runs (once):**
@@ -207,6 +247,7 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 | `claudeit load` | Start of session — pull (dctx) + read context + brief Claude |
 | `claudeit save` | End of session — show diff, write files, push (dctx) |
 | `claudeit update <file> <change>` | Mid-session context update |
+| `claudeit update responsible-ai "<principle>"` | Add a project-specific AI principle |
 | `claudeit status` | Features snapshot, last save, open TODOs |
 | `claudeit join <url>` | Join a distributed project as a teammate |
 | `claudeit login` | Set up or refresh git authentication |
@@ -223,6 +264,7 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 | `decisions.md` | What was decided and why — Claude never re-suggests what you already rejected |
 | `conventions.md` | Naming, file structure, git, testing — Claude follows your standards without being told |
 | `guardrails.md` | What NOT to build — Claude flags conflicts before you start building |
+| `responsible-ai.md` | Six core AI principles — conflicts require written justification, logged permanently |
 
 ## Context hygiene
 
@@ -231,6 +273,8 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 - Files over 300 lines → Claude archives old entries automatically to keep load fast
 - No secrets ever written to `.contextit/` — Claude refuses and warns if detected
 - Guardrail overrides require a dated reason — the original rule is never deleted
+- Responsible AI conflicts require a written justification — "yes" or "ok" are not accepted
+- Responsible AI overrides are logged permanently and can never be edited after the fact
 
 ## FAQ
 
@@ -251,6 +295,12 @@ Yes. Each project has its own `.contextit/` folder. Completely independent. Run 
 
 **What if I want to use GitLab?**  
 GitLab support is on the roadmap. The token flow is identical — only the host and scope names differ.
+
+**Can I remove the Responsible AI framework after adding it?**  
+The six core principles cannot be removed — only overridden with a logged justification. Project-specific principles can be removed by the project owner with a logged reason. If you didn't add it during init, you can add it any time by running `claudeit update responsible-ai`.
+
+**What counts as a valid justification for a Responsible AI conflict?**  
+A specific explanation of why the conflict is acceptable in your context. "It's fine" or "we need it to ship" are rejected. A valid justification explains the reasoning — for example: "Drafting only — user reviews and confirms before send. Human control over sending is fully preserved."
 
 ## License
 
