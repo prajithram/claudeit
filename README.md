@@ -42,6 +42,18 @@ claudeit load
 What are we working on today?
 ```
 
+And when you're done:
+
+```
+claudeit commit
+
+📝 Generated commit message
+   feat(checkout): collapse 3-step wizard to 2-step
+   Merged billing and shipping into single step — drop-off fix.
+
+   Confirm? (yes / edit / cancel)
+```
+
 ## How it works
 
 claudeit extends Claude's built-in `CLAUDE.md` system with a `.contextit/` folder of structured project context files. Claude reads them at the start of every session.
@@ -208,6 +220,73 @@ claudeit update responsible-ai "No AI content in patient-facing outputs without 
 
 Core principles cannot be removed. Project principles can be removed by the project owner with a logged reason.
 
+## Git — with project intelligence
+
+claudeit handles your git workflow directly inside Claude Code. No switching to another terminal. Every command is smarter because it knows your project.
+
+```
+claudeit commit    ← generates commit message from your session
+claudeit push      ← guardrail check → confirm → push
+claudeit pull      ← pull + plain English summary of what changed
+claudeit pr        ← drafts full PR title, body and testing checklist
+claudeit branch    ← branch name enforced from your conventions
+claudeit sync      ← pull + merge + push safely in sequence
+claudeit log       ← plain English git history
+claudeit diff      ← diff explained in context of what you're building
+claudeit merge     ← merge with conflict explanation if needed
+claudeit undo      ← shows what undoes before running anything
+claudeit git <cmd> ← any git command with claudeit intelligence
+```
+
+**Every write operation requires confirmation before running.** Claude shows exactly what it will execute and waits for your yes. Destructive commands — force push, hard reset, clean — require typing `CONFIRM` and get a red warning.
+
+### Commit messages that actually describe what you built
+
+```
+claudeit commit
+
+📝 Generated commit message
+┌─────────────────────────────────────────────────────────────┐
+│  feat(checkout): collapse 3-step wizard to 2-step           │
+│                                                             │
+│  Merged billing and shipping into single screen based on    │
+│  internal review showing drop-off at Step 2. Progress       │
+│  indicator updated to shadcn Steps with 2 steps.            │
+├─────────────────────────────────────────────────────────────┤
+│  4 files changed · 87 insertions · 23 deletions             │
+│  Confirm? (yes / edit / cancel)                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Claude reads your session conversation and the actual diff — then writes a conventional commit that accurately describes what you built, not what you remember to type.
+
+### PR descriptions that include a guardrail check
+
+```
+claudeit pr
+
+🔀 Pull Request Draft
+┌─────────────────────────────────────────────────────────────┐
+│  feat(checkout): collapse wizard to 2-step flow             │
+├─────────────────────────────────────────────────────────────┤
+│  ## What this does                                          │
+│  Reduces checkout from 3 steps to 2 by merging billing      │
+│  and shipping. Internal review showed drop-off at Step 2.   │
+│                                                             │
+│  ## Testing                                                 │
+│  - [ ] Checkout flow end-to-end                             │
+│  - [ ] Mobile layout · Back button behaviour                │
+│                                                             │
+│  ## Guardrails respected                                    │
+│  ✅ No modals used                                          │
+│  ✅ No third-party analytics added                          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Pre-push guardrail check
+
+Before every push Claude scans the outgoing diff against your guardrails. If something conflicts it stops — same written justification requirement as the RAI framework — before anything leaves your machine.
+
 ## Distributed setup
 
 **Step 1 — Project owner runs (once):**
@@ -252,6 +331,19 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 | `claudeit join <url>` | Join a distributed project as a teammate |
 | `claudeit login` | Set up or refresh git authentication |
 | `claudeit login reset` | Clear expired token and re-authenticate |
+| **Git** | |
+| `claudeit commit` | Generate commit message from session → confirm → commit |
+| `claudeit push` | Guardrail check → confirm → push |
+| `claudeit pull` | Pull + plain English summary of what changed |
+| `claudeit pr` | Draft PR title, body and guardrail checklist |
+| `claudeit branch <desc>` | Branch name from conventions → confirm → create |
+| `claudeit sync` | Fetch + pull + push safely step by step |
+| `claudeit log` | Plain English git history |
+| `claudeit diff` | Diff explained in project context |
+| `claudeit stash` | Auto-named stash from session context |
+| `claudeit merge <branch>` | Merge with conflict explanation |
+| `claudeit undo` | Show what undoes → soft reset → confirm |
+| `claudeit git <cmd>` | Any git command with claudeit intelligence |
 
 ## What Claude knows after load
 
@@ -275,6 +367,8 @@ Full setup guide: [`references/git-token-setup.md`](references/git-token-setup.m
 - Guardrail overrides require a dated reason — the original rule is never deleted
 - Responsible AI conflicts require a written justification — "yes" or "ok" are not accepted
 - Responsible AI overrides are logged permanently and can never be edited after the fact
+- All git write operations (commit, push, merge) require explicit confirmation before running
+- Destructive git commands (force push, hard reset) require typing CONFIRM and show a red warning
 
 ## FAQ
 
@@ -292,6 +386,9 @@ claudeit always shows a diff before committing. In distributed mode, treat conte
 
 **Can I use it across multiple projects?**  
 Yes. Each project has its own `.contextit/` folder. Completely independent. Run `claudeit init` in each project once.
+
+**Do I need to leave Claude Code to run git commands?**  
+No. claudeit handles git directly inside your Claude Code session. `claudeit commit`, `claudeit push`, `claudeit pull`, `claudeit pr` — all run without opening another terminal. Claude generates commit messages from your session, names branches from your conventions, and checks guardrails before every push.
 
 **What if I want to use GitLab?**  
 GitLab support is on the roadmap. The token flow is identical — only the host and scope names differ.
