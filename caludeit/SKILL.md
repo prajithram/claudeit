@@ -819,6 +819,28 @@ every new feature, suggestion, or decision — without being asked.
 
 ---
 
+## Git Integration
+
+claudeit includes a full smart git layer — see `references/git-skill.md` for the complete reference.
+Every git command runs with project context: commit messages from your session, branch
+names from your conventions, PR descriptions from your diff, pre-push guardrail checks.
+
+All write operations require confirmation. Destructive commands require typing CONFIRM.
+
+```
+claudeit commit      ← generates message from session context
+claudeit push        ← guardrail check → confirm → push
+claudeit pull        ← pull + plain English summary
+claudeit pr          ← drafts full PR description
+claudeit branch <x>  ← name enforced from conventions.md
+claudeit sync        ← pull + merge + push safely in sequence
+claudeit log         ← plain English git history
+claudeit diff        ← diff explained in project context
+claudeit git <cmd>   ← any git command with claudeit intelligence
+```
+
+---
+
 ## Quick Reference
 
 | Command | What it does |
@@ -841,4 +863,5 @@ every new feature, suggestion, or decision — without being asked.
 - `references/init-interview.md` — How Claude extracts context during setup
 - `references/guardrails.md` — How to write and enforce good guardrails
 - `references/responsible-ai-guide.md` — Full Responsible AI framework, principles, and enforcement rules
+- `references/git-skill.md` — Full smart git integration — all commands, smart features, and safety rules
 - `references/git-token-setup.md` — Step-by-step PAT setup for GitHub/GitLab on macOS and Windows
